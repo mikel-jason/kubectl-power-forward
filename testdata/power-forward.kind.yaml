@@ -1,0 +1,12 @@
+proxy:
+  socks:
+    enabled: true
+  httpReverse:
+    enabled: true
+    listenAddress: "0.0.0.0:8080"
+forwards:
+  - namespace: default
+    serviceName: echoserver
+    podPort: 5678
+    localPort: 8081
+    hostname: echo.kind.proxy

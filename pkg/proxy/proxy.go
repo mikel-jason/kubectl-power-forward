@@ -19,6 +19,9 @@ type Config struct {
 }
 
 func Start(cfg *Config) error {
+	if cfg.SocksListenAddr == "" {
+		return nil
+	}
 	l, err := net.Listen("tcp", cfg.SocksListenAddr)
 	if err != nil {
 		return fmt.Errorf("cannot start TCP listener on %s: %w", cfg.SocksListenAddr, err)
@@ -52,6 +55,10 @@ func Start(cfg *Config) error {
 			}()
 		}
 	}()
+
+	if cfg.HttpListenAddr == "" {
+		return nil
+	}
 
 	localDirector := createLocalReverseDirector(cfg.Mappings)
 	reverseProxy := &httputil.ReverseProxy{
