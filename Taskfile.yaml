@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  cluster-up:
+    desc: Create and bootstrap a test cluster
+    vars:
+      KUBECTL: "kubectl --context kind-power-forward"
+      POD_NAME: echoserver
+      SERVICE_NAME: echoserver
+    cmds:
+      - '[[ "$(kind get clusters 2>/dev/null | grep "power-forward" | wc -l)" == "1" ]] || kind create cluster --config kind.yaml'
+      - '{{ .KUBECTL }} get po {{ .POD_NAME }} &>/dev/null || ({{ .KUBECTL }} create serviceaccount default && {{ .KUBECTL }} run echoserver --image hashicorp/http-echo --port 5678)'
+      - '{{ .KUBECTL }} get service {{ .SERVICE_NAME}} &>/dev/null || {{ .KUBECTL }} expose pod {{ .POD_NAME }} --port 5678 --name {{ .SERVICE_NAME }}'
+  cluster-down:
+    desc: Destroy test cluster
+    cmds:
+      - kind delete cluster --name power-forward

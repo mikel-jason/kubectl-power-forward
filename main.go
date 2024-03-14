@@ -15,16 +15,10 @@ func main() {
 	cfg := &powerforward.Config{
 		Forwards: []powerforward.Forward{
 			{
-				Namespace:   "forecastle",
-				ServiceName: "forecastle",
-				PodPort:     3000,
+				Namespace:   "default",
+				ServiceName: "echoserver",
+				PodPort:     5678,
 				LocalPort:   8080,
-			},
-			{
-				Namespace:   "kube-system",
-				ServiceName: "hubble-ui",
-				PodPort:     8081,
-				LocalPort:   8081,
 			},
 		},
 	}
