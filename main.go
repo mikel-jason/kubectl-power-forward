@@ -35,8 +35,11 @@ func main() {
 
 	proxy.Start(
 		&proxy.Config{
-			ListenAddr: "0.0.0.0:8888",
-			LocalNames: []string{"everything.k8s.proxy"},
+			SocksListenAddr: "0.0.0.0:8888",
+			HttpListenAddr:  "0.0.0.0:80",
+			Mappings: map[string]int{
+				"everything.k8s.proxy": 8080,
+			},
 		},
 	)
 
