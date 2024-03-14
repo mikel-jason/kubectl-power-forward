@@ -1,0 +1,67 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    - id: check-added-large-files
+    - id: check-case-conflict
+    - id: check-executables-have-shebangs
+    - id: check-json
+    - id: check-merge-conflict
+    - id: check-symlinks
+    - id: check-yaml
+    - id: detect-aws-credentials
+      args:
+      - --allow-missing-credentials
+    - id: detect-private-key
+      exclude: ".gitleaks*|.*/generate/.*/values-default.yml"
+    - id: end-of-file-fixer
+    - id: fix-byte-order-marker
+    - id: forbid-new-submodules
+    - id: mixed-line-ending
+    - id: pretty-format-json
+      args:
+      - --autofix
+      - --no-sort-keys
+      - --indent=2
+      exclude: '^.*/prometheus/chart/dashboards/.*$'
+    - id: trailing-whitespace
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.16.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+    - id: gitlint
+      stages: [commit-msg]
+      args:
+        - --contrib=contrib-title-conventional-commits
+        - --ignore=body-is-missing,body-min-length
+        - --msg-filename
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.3.1
+    hooks:
+      - id: forbid-crlf
+      - id: remove-crlf
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 3.0.0
+    hooks:
+      - id: forbid-binary
+        exclude: |
+          (?x)(
+              ^.github/images/
+          )
+      - id: shellcheck # Needs shellcheck: https://github.com/koalaman/shellcheck
+      - id: shfmt # Needs shfmt: https://github.com/mvdan/sh/releases
+
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+      - id: go-mod-tidy
+      - id: go-build
+      - id: go-unit-tests
