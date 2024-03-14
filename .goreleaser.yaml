@@ -6,6 +6,9 @@ builds:
     main: ./cmd/kubectl-power-forward
     ldflags:
       - "-s -w -extldflags '-static'"
+      - "-X main.version={{ .Version }}"
+      - "-X main.commit={{ .Commit }}"
+      - "-X main.date={{ .CommitDate }}"
     env:
       - CGO_ENABLED=0
     goos:

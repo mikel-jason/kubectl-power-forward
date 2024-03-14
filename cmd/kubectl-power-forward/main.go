@@ -14,8 +14,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "kubectl-power-forward",
-	Short: "kubectl-power-forward is kubectl port-forward on steroids",
+	Use:     "kubectl-power-forward",
+	Version: version,
+	Short:   "kubectl-power-forward is kubectl port-forward on steroids",
 	Long: `kubectl-power-forward allows port-fowarding to a Kubernetes service with auto-reconnect on connection lost.
 It contains a SOCKS and HTTP reverse proxy to simulate accessing your workloads with real-word domains.
 
@@ -87,6 +88,9 @@ func main() {
 	}
 	defaultConfigFile := filepath.Join(pwd, ".power-forward.yaml")
 	rootCmd.Flags().StringP("config", "f", defaultConfigFile, "Path to config file")
+
+	rootCmd.AddCommand(versionCmd)
+
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 	}
