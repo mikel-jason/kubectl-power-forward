@@ -40,7 +40,8 @@ forwards:
 For using privileged ports, you must bind the capability to the binary like this:
 sudo setcap 'cap_net_bind_service+ep' <PATH_TO_BINARY>
 `,
-	Args: cobra.NoArgs,
+	Args:              cobra.NoArgs,
+	CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	Run: func(cmd *cobra.Command, args []string) {
 		configFilePath := cmd.Flag("config").Value.String()
 
