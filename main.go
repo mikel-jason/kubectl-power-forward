@@ -1,32 +1,35 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/mikel-jason/kube-power-forward/pkg/kube"
+	"github.com/mikel-jason/kube-power-forward/pkg/cmd/powerforward"
 )
 
 func main() {
 
-	client, err := kube.NewClient()
-	if err != nil {
-		log.Fatalf("cannot create kube client: %v", err)
+	cfg := &powerforward.Config{
+		Forwards: []powerforward.Forward{
+			{
+				Namespace:   "forecastle",
+				ServiceName: "forecastle",
+				PodPort:     3000,
+				LocalPort:   8080,
+			},
+			{
+				Namespace:   "kube-system",
+				ServiceName: "hubble-ui",
+				PodPort:     8081,
+				LocalPort:   8081,
+			},
+		},
 	}
 
-	service := client.Service("forecastle", "forecastle")
-
-	forwarder := client.Forwarder(service, kube.ForwarderOptions{
-		PodPort:   3000,
-		LocalPort: 3000,
-	})
-
-	err = forwarder.Start(context.TODO())
-	if err != nil {
-		log.Fatalf("cannot port-forward: %v", err)
+	if err := powerforward.Start(cfg); err != nil {
+		log.Fatalln(err)
 	}
 
 	signalForShutdownChan := make(chan os.Signal, 1)
@@ -34,5 +37,5 @@ func main() {
 
 	<-signalForShutdownChan
 	log.Println("received shutdown signal, stopping forwarders")
-	forwarder.Stop()
+	powerforward.Stop()
 }
