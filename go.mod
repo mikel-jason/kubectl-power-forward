@@ -3,6 +3,7 @@ module github.com/mikel-jason/kube-power-forward
 go 1.21.1
 
 require (
+	github.com/things-go/go-socks5 v0.0.5
 	k8s.io/api v0.29.2
 	k8s.io/apimachinery v0.29.2
 	k8s.io/client-go v0.29.2

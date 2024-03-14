@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/mikel-jason/kube-power-forward/pkg/cmd/powerforward"
+	"github.com/mikel-jason/kube-power-forward/pkg/proxy"
 )
 
 func main() {
@@ -32,10 +33,22 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	proxy.Start(
+		&proxy.Config{
+			ListenAddr: "0.0.0.0:8888",
+			LocalNames: []string{"everything.k8s.proxy"},
+		},
+	)
+
+	log.Println("up and running")
+
 	signalForShutdownChan := make(chan os.Signal, 1)
 	signal.Notify(signalForShutdownChan, os.Interrupt, syscall.SIGTERM)
 
 	<-signalForShutdownChan
-	log.Println("received shutdown signal, stopping forwarders")
+	log.Println("received shutdown signal")
+	proxy.Stop()
+
+	log.Println("stopping forwarders")
 	powerforward.Stop()
 }
