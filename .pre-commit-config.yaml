@@ -51,10 +51,10 @@ repos:
     rev: 3.0.0
     hooks:
       - id: forbid-binary
-        exclude: |
-          (?x)(
-              ^.github/images/
-          )
+        exclude: >
+          (?x)^(
+            website/content/featured-background.jpg
+          )$
       - id: shellcheck # Needs shellcheck: https://github.com/koalaman/shellcheck
       - id: shfmt # Needs shfmt: https://github.com/mvdan/sh/releases
 

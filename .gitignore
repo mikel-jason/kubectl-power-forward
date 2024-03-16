@@ -303,3 +303,18 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,go,visualstudiocode,goland,vim,emacs
 
 dist/
+
+# website -> https://www.toptal.com/developers/gitignore/api/hugo
+# Generated files by hugo
+/website/public/
+/website/resources/_gen/
+/website/assets/jsconfig.json
+hugo_stats.json
+
+# Executable may be added to repository
+hugo.exe
+hugo.darwin
+hugo.linux
+
+# Temporary lock file while building
+/website/.hugo_build.lock
