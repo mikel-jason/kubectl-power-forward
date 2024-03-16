@@ -302,15 +302,4 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,go,visualstudiocode,goland,vim,emacs
 
-# remove all markdown for local testing
-*.md
-!README.md
-!DEVELOPING.md
-!USERS.md
-
-# binary
-/git-changelog
-/changelog
-/cli
-
 dist/
