@@ -6,6 +6,8 @@
 <i>kubectl port-forward on steroids</i>
 <br />
 <a href="https://mikel-jason.github.io/kubectl-power-forward"><img src="https://img.shields.io/badge/Documentation-Github%20Pages-8A2BE2"></a>
+<img src="https://img.shields.io/github/v/release/mikel-jason/kubectl-power-forward?include_prereleases">
+<img src="https://img.shields.io/github/license/mikel-jason/kubectl-power-forward">
 </div>
 <br />
 
