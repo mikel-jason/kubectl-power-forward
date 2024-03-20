@@ -3,7 +3,7 @@ title: kubectl power-forward
 ---
 
 {{< blocks/cover title="Port-forwarding on steriods!" image_anchor="top" byline="Photo by Clark Van Der Beken on Unsplash" >}}
-<a class="btn btn-lg btn-primary me-3 mb-4" href="/docs/">
+<a class="btn btn-lg btn-primary me-3 mb-4" href="{{< ref "/docs/_index.md" >}}">
   Getting Started <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 </a>
 <a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/mikel-jason/kubectl-power-forward" target="_blank">
