@@ -29,6 +29,28 @@ forwards:
 
 If a connection is lost (rescheduling of a pod), `kubectl-powre-forward` will reconnect to a different pod immediately.
 
+### Forwarding from specific contexts
+
+By default, `kubectl-power-forward` uses the user's current context, respecting `KUBECONFIG` environment variable. You can optionally add a `context` parameter to specific a particular for one forward, while using another specific or the current context for other forwards.
+
+```yaml
+forwards:
+  - namespace: default # this is using the current context
+    serviceName: echoserver
+    podPort: 5678
+    localPort: 8080
+  - namespace: test
+    serviceName: very-important-app
+    podPort: 80
+    localPort: 8081
+    context: prod
+  - namespace: production
+    serviceName: very-important-app
+    podPort: 80
+    localPort: 8082
+    context: prod
+```
+
 ## Adding a SOCKS proxy
 You can also add a SOCKS proxy to allow using custom domains locally. You have to explicitly enable it via the `proxy.socks.enabled` parameter. To define a domain that should be intercepted and pointed to `localhost`, add a `hostname` to your forwards:
 

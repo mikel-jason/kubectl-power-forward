@@ -6,6 +6,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 type Service interface {
@@ -13,21 +14,27 @@ type Service interface {
 }
 
 type service struct {
-	client    *client
+	client    *kubernetes.Clientset
+	context   Context
 	namespace string
 	name      string
 }
 
-func (c *client) Service(namespace string, name string) Service {
+func (c *client) Service(ctx Context, namespace string, name string) (Service, error) {
+	kubeClient, err := c.getKubeClient(ctx.Name)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get kubernetes client for context '%s': %w", ctx.Name, err)
+	}
 	return &service{
-		client:    c,
+		client:    kubeClient.clientset,
+		context:   ctx,
 		namespace: namespace,
 		name:      name,
-	}
+	}, nil
 }
 
 func (s *service) loadService(ctx context.Context) (*corev1.Service, error) {
-	svc, err := s.client.k8sClientSet.CoreV1().Services(s.namespace).Get(ctx, s.name, metav1.GetOptions{})
+	svc, err := s.client.CoreV1().Services(s.namespace).Get(ctx, s.name, metav1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("cannot get service %s/%s: %w", s.namespace, s.name, err)
 	}
@@ -40,7 +47,7 @@ func (s *service) GetPod(ctx context.Context) (*corev1.Pod, error) {
 		return nil, err
 	}
 
-	podList, err := s.client.k8sClientSet.CoreV1().Pods(s.namespace).List(ctx, metav1.ListOptions{
+	podList, err := s.client.CoreV1().Pods(s.namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: metav1.FormatLabelSelector(
 			&metav1.LabelSelector{
 				MatchLabels: svc.Spec.Selector,

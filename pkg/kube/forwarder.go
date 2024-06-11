@@ -21,6 +21,7 @@ type Forwarder interface {
 
 type forwarder struct {
 	client   *client
+	context  Context
 	service  Service
 	options  ForwarderOptions
 	ctx      context.Context
@@ -28,14 +29,15 @@ type forwarder struct {
 	stopChan chan (struct{})
 }
 
-func (c *client) Forwarder(service Service, options ForwarderOptions) Forwarder {
+func (c *client) Forwarder(ctx Context, service Service, options ForwarderOptions) (Forwarder, error) {
 	return &forwarder{
 		client:   c,
+		context:  ctx,
 		service:  service,
 		options:  options,
 		running:  false,
 		stopChan: make(chan struct{}, 1),
-	}
+	}, nil
 }
 
 type ForwarderOptions struct {
@@ -132,9 +134,17 @@ func (f *forwarder) Stop() {
 }
 
 func (f *forwarder) dialer(pod *corev1.Pod) (httpstream.Dialer, error) {
-	url := f.client.k8sClientSet.CoreV1().RESTClient().Post().Resource("pods").Namespace(pod.Namespace).Name(pod.Name).SubResource("portforward").URL()
+	kubeClient, err := f.client.getKubeClient(f.context.Name)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get kubernetes client for context '%s': %w", f.context.Name, err)
+	}
+	restClient, err := kubeClient.clientConfig.ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("cannot get rest client for context '%s': %w", f.context.Name, err)
+	}
+	url := kubeClient.clientset.CoreV1().RESTClient().Post().Resource("pods").Namespace(pod.Namespace).Name(pod.Name).SubResource("portforward").URL()
 
-	transport, upgrader, err := spdy.RoundTripperFor(f.client.restConfig)
+	transport, upgrader, err := spdy.RoundTripperFor(restClient)
 	if err != nil {
 		return nil, err
 	}
