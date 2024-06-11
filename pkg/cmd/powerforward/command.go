@@ -19,11 +19,12 @@ type Config struct {
 }
 
 type Forward struct {
-	Namespace   string `json:"namespace"`
-	ServiceName string `json:"serviceName"`
-	PodPort     int    `json:"podPort"`
-	LocalPort   int    `json:"localPort"`
-	Hostname    string `json:"hostname,omitempty"`
+	Namespace       string `json:"namespace"`
+	ServiceName     string `json:"serviceName"`
+	PodPort         int    `json:"podPort"`
+	LocalPort       int    `json:"localPort"`
+	Hostname        string `json:"hostname,omitempty"`
+	KubeContextName string `json:"context,omitempty"`
 }
 
 func Start(cfg *Config) error {
@@ -35,11 +36,20 @@ func Start(cfg *Config) error {
 	forwarders = make([]kube.Forwarder, len(cfg.Forwards))
 	mappings := make(map[string]int)
 	for forwardIndex, forward := range cfg.Forwards {
-		forwardService := client.Service(forward.Namespace, forward.ServiceName)
-		forwarder := client.Forwarder(forwardService, kube.ForwarderOptions{
+		ctx := kube.Context{Name: forward.KubeContextName}
+		forwardService, err := client.Service(ctx, forward.Namespace, forward.ServiceName)
+		if err != nil {
+			return fmt.Errorf("cannot load service (context: %s, namespace: %s, service name: %s): %w",
+				forward.KubeContextName, forward.Namespace, forward.ServiceName, err)
+		}
+		forwarder, err := client.Forwarder(ctx, forwardService, kube.ForwarderOptions{
 			PodPort:   forward.PodPort,
 			LocalPort: forward.LocalPort,
 		})
+		if err != nil {
+			return fmt.Errorf("cannot load forwarder (context: %s, namespace: %s, service name: %s): %w",
+				forward.KubeContextName, forward.Namespace, forward.ServiceName, err)
+		}
 		if forward.Hostname != "" {
 			if _, exists := mappings[forward.Hostname]; exists {
 				log.Printf("Service %s/%s should be proxied as %s, but domain is already mapped to another service. Skipping...\n", forward.Namespace, forward.ServiceName, forward.Hostname)
@@ -47,7 +57,7 @@ func Start(cfg *Config) error {
 				mappings[forward.Hostname] = forward.LocalPort
 			}
 		}
-		err := forwarder.Start(context.TODO())
+		err = forwarder.Start(context.TODO())
 		if err != nil {
 			Stop()
 			return fmt.Errorf("could not start forwarder for service %s/%s: %w", forward.Namespace, forward.ServiceName, err)
